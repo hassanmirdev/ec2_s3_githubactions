@@ -44,7 +44,7 @@ jobs:
 
       # Initialize Terraform
       - name: Initialize Terraform
-        run: terraform init
+        run: terraform init -reconfigure
 
       # Generate Terraform Plan
       - name: Generate Terraform Plan
