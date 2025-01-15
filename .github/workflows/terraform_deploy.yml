@@ -44,7 +44,10 @@ jobs:
 
       # Initialize Terraform
       - name: Initialize Terraform
-        run: terraform init -reconfigure
+        run: | 
+         rm -rf .terraform
+         rm terraform.tfstate
+         terraform init
 
       # Generate Terraform Plan
       - name: Generate Terraform Plan
