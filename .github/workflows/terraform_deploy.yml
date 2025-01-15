@@ -41,15 +41,15 @@ jobs:
       run: terraform plan -out=tfplan
 
     # Generate markdown file for PR review
-    - name: Generate Markdown for Plan
-      run: terraform show -json tfplan | terraform-docs markdown . > plan.md
+    - name: Generate README.md with terraform-docs
+      run: terraform-docs markdown . > README.md
 
     # Upload the generated markdown as an artifact for PR review
     - name: Upload Terraform Plan Markdown
       uses: actions/upload-artifact@v4.6.0
       with:
         name: terraform-plan
-        path: plan.md
+        path: README.md
 
     # Apply Terraform Plan to create resources on AWS
     - name: Terraform Apply
