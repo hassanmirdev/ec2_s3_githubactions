@@ -67,5 +67,5 @@ jobs:
 
       # Apply the Terraform configuration to AWS
       - name: Apply Terraform Configuration
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
         if: github.event_name == 'push'  # Only apply on push to main branch (after PR merge)
