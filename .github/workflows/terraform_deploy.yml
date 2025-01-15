@@ -28,6 +28,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-east-1"
+      
+      - name: install lfs
+        run: |
+         git lfs install
+         git lfs pull
+         run: git lfs track ".terraform/**/*"
+         git add .gitattributes
+         git commit -m "Add .terraform files to Git LFS"
+         git push origin main
+
 
       # Initialize Terraform
       - name: Initialize Terraform
