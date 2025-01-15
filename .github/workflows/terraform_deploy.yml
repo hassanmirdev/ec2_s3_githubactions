@@ -1,9 +1,9 @@
 name: Terraform AWS Ec2 Deploy
 
 on:
- push:
-  branches:
-      - main  # Trigger on push to the main branch
+ # push:
+ # branches:
+   # - main  # Trigger on push to the main branch
  pull_request:
     branches:
       - main  # Trigger on pull requests to the main branch
