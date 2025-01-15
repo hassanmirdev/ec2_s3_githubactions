@@ -60,8 +60,7 @@ jobs:
       with:
        name: terraform-docs
        path: terraform-docs.md
-       
-    # Apply Terraform Plan to create resources on AWS
+   
     - name: Terraform Apply
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' && github.event.pull_request.merged == true
       run: terraform apply -auto-approve tfplan
