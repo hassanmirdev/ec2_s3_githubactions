@@ -1,57 +1,52 @@
-name: Terraform Deploy
+name: Automate AWS Infrastructure Deployment
 
 on:
- # workflow_dispatch:
- push:
-  branches:
-  - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    
+
     steps:
-    # Checkout the repository
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Set up Terraform
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2.0.3
-      with:
-        terraform_version: 1.10.3
+      # Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: 1.10.3  # Adjust this to the Terraform version you need
+          
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
 
-    # Set up AWS credentials from GitHub Secrets
-    - name: AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: "us-east-1"
-    # install terraform docs
-    - name: terraform docs
-      run: sudo snap install terraform-docs
+      # Initialize Terraform
+      - name: Initialize Terraform
+        run: terraform init
 
-    # Initialize Terraform
-    - name: Terraform Init
-      run: terraform init
+      # Generate Terraform Plan
+      - name: Generate Terraform Plan
+        run: terraform plan -out=tfplan
 
-    # Generate Terraform Plan
-    - name: Terraform Plan
-      run: terraform plan -out=tfplan
+      # Generate and push Terraform docs for Pull Request review
+      - name: Render Terraform Docs and Push Changes to PR
+        uses: terraform-docs/gh-actions@main
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
 
-    # Generate markdown file for PR review
-    - name: Generate README.md with terraform-docs
-      run: terraform-docs markdown . > README.md
-
-    # Upload the generated markdown as an artifact for PR review
-    - name: Upload Terraform Plan Markdown
-      uses: actions/upload-artifact@v4.6.0
-      with:
-        name: terraform-plan
-        path: README.md
-
-    # Apply Terraform Plan to create resources on AWS
-    - name: Terraform Apply
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve tfplan
+      # Apply the Terraform configuration to AWS
+      - name: Apply Terraform Configuration
+        run: terraform apply -auto-approve tfplan
+        if: github.event_name == 'push'  # Only apply on push to main branch (after PR merge)
