@@ -1,0 +1,55 @@
+name: Terraform Docs and Deployment
+
+on:
+  pull_request:
+    branches:
+      - main  
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Render Terraform Docs and Push Changes to PR
+      uses: terraform-docs/gh-actions@main
+      with:
+        working-dir: .  # Run in the root of the repository
+        output-file: README.md  # Output the docs to README.md
+        output-method: inject  # Inject the generated docs into the file
+        git-push: "true"  # Push the changes back to the PR
+
+  # Job to handle Terraform deployment after PR merge
+  terraform-deploy:
+    runs-on: ubuntu-latest
+    needs: docs  # This job runs after the docs job
+
+    if: github.ref == 'refs/heads/main' && github.event.pull_request.merged == true  # Only run when PR is merged to `main`
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0  # Specify Terraform version
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: us-east-1  # Specify your AWS region
+
+    - name: Initialize Terraform
+      run: terraform init
+
+    - name: Generate Terraform Plan
+      run: terraform plan -out=tfplan
+
+    - name: Apply Terraform Plan
+      run: terraform apply -auto-approve tfplan
