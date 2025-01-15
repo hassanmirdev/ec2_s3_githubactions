@@ -30,6 +30,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: "us-east-1"
+  
     # install terraform docs
     - name: terraform docs
       run: sudo snap install terraform-docs
@@ -38,30 +39,26 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    # Generate Terraform Plan
+    # Generate Terraform Plan in the PR (pull_request event)
     - name: Terraform Plan
+      id: plan
+      if: github.event_name == 'pull_request'  # Only run for PR events
       run: terraform plan -out=tfplan
 
-    # Generate markdown file for PR review
-    - name: Generate Markdown for Plan
-      run: terraform show -json tfplan | terraform-docs markdown . > terraform-docs.md
+    # Generate Markdown documentation from Terraform plan for PR review
+    - name: Generate Terraform Documentation
+      if: github.event_name == 'pull_request'  # Only run for PR events
+      run: terraform-docs markdown . > terraform-docs.md
 
-
-    # Upload the generated markdown as an artifact for PR review
-    # - name: Upload Terraform Plan Markdown
-     # uses: actions/upload-artifact@v4.6.0
-     # with:
-     #  name: terraform-plan
-      # path: terraform-docs.md
-
+    # Upload Terraform Docs for PR review
     - name: Upload Terraform Docs for PR review
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request'  # Only run for PR events
       uses: actions/upload-artifact@v4.6.0
       with:
        name: terraform-docs
        path: terraform-docs.md
-       
-    # Apply Terraform Plan to create resources on AWS
+
+    # Apply Terraform Plan when the PR is merged (push to main branch)
     - name: Terraform Apply
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'  # Only run after PR is merged into main
       run: terraform apply -auto-approve tfplan
