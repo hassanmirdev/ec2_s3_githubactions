@@ -4,7 +4,7 @@ provider "aws" {
 
 # Create an EC2 Instance
 resource "aws_instance" "my_instance" {
-  ami           = "ami-0e2c8caa4b6378d8c"  # Update with a valid AMI ID in your region
+  ami           = "ami-005fc0f236362e99f"  # Update with a valid AMI ID in your region
   instance_type = "t2.micro"  # Adjust the instance type as per your needs
 
   tags = {
