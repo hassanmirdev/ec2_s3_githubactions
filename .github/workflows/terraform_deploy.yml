@@ -1,12 +1,10 @@
-name: Terraform AWS Ec2 Deploy
+name: Terraform Deploy
 
 on:
+ # workflow_dispatch:
  push:
   branches:
-      - main  # Trigger on push to the main branch
- pull_request:
-    branches:
-      - main  # Trigger on pull requests to the main branch
+  - main
 
 jobs:
   terraform:
@@ -44,23 +42,16 @@ jobs:
 
     # Generate markdown file for PR review
     - name: Generate Markdown for Plan
-      run: terraform show -json tfplan | terraform-docs markdown . > terraform-docs.md
-
+      run: terraform show -json tfplan | terraform-docs markdown . > plan.md
 
     # Upload the generated markdown as an artifact for PR review
-    # - name: Upload Terraform Plan Markdown
-     # uses: actions/upload-artifact@v4.6.0
-     # with:
-     #  name: terraform-plan
-      # path: terraform-docs.md
-
-    - name: Upload Terraform Docs for PR review
-      if: github.event_name == 'pull_request'
+    - name: Upload Terraform Plan Markdown
       uses: actions/upload-artifact@v4.6.0
       with:
-       name: terraform-docs
-       path: terraform-docs.md
-   
+        name: terraform-plan
+        path: plan.md
+
+    # Apply Terraform Plan to create resources on AWS
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event.pull_request.merged == true
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve tfplan
