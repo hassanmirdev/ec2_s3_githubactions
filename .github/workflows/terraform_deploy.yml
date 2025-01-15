@@ -1,9 +1,12 @@
 name: Terraform Deploy
 
 on:
-  push:
-   branches:
-   - main
+ push:
+  branches:
+      - main  # Trigger on push to the main branch
+ pull_request:
+    branches:
+      - main  # Trigger on pull requests to the main branch
 
 jobs:
   terraform:
@@ -41,15 +44,23 @@ jobs:
 
     # Generate markdown file for PR review
     - name: Generate Markdown for Plan
-      run: terraform show -json tfplan | terraform-docs markdown . > plan.md
+      run: terraform show -json tfplan | terraform-docs markdown . > terraform-docs.md
+
 
     # Upload the generated markdown as an artifact for PR review
-    - name: Upload Terraform Plan Markdown
+    # - name: Upload Terraform Plan Markdown
+     # uses: actions/upload-artifact@v4.6.0
+     # with:
+     #  name: terraform-plan
+      # path: terraform-docs.md
+
+    - name: Upload Terraform Docs for PR review
+      if: github.event_name == 'pull_request'
       uses: actions/upload-artifact@v4.6.0
       with:
-        name: terraform-plan
-        path: plan.md
-
+       name: terraform-docs
+       path: terraform-docs.md
+       
     # Apply Terraform Plan to create resources on AWS
     - name: Terraform Apply
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
