@@ -46,7 +46,6 @@ jobs:
       - name: Initialize Terraform
         run: | 
          rm -rf .terraform
-         rm terraform.tfstate
          terraform init
 
       # Generate Terraform Plan
