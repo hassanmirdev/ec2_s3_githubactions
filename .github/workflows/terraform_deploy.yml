@@ -53,5 +53,5 @@ jobs:
 
     # Apply Terraform Plan to create resources on AWS
     - name: Terraform Apply
-      if: github.event_name == push' && github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve tfplan
