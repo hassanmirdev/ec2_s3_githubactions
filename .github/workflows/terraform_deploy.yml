@@ -38,7 +38,7 @@ jobs:
 
     # Generate Terraform Plan
     - name: Terraform Plan
-      run: terraform plan -out=tfplan -lock=false
+      run: terraform plan -out=tfplan
 
     # Generate markdown file for PR review
     - name: Generate Markdown for Plan
@@ -54,4 +54,4 @@ jobs:
     # Apply Terraform Plan to create resources on AWS
     - name: Terraform Apply
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve "tfplan" -lock=false
+      run: terraform apply -auto-approve tfplan
