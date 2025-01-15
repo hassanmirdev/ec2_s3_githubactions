@@ -32,7 +32,7 @@ jobs:
       - name: install lfs
         run: |
          git lfs install
-         run: git lfs track ".terraform/**/*"
+         git lfs track ".terraform/**/*"
          git add .gitattributes
          git commit -m "Add .terraform files to Git LFS"
          git push origin main
