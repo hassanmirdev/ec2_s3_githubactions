@@ -8,7 +8,7 @@ resource "aws_instance" "my_instance" {
   instance_type = "t2.micro"  # Adjust the instance type as per your needs
 
   tags = {
-    Name = "MyInstance005"
+    Name = "MyInstance06"
   }
 }
 terraform {
