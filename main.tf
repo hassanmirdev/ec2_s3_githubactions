@@ -5,7 +5,7 @@ provider "aws" {
 # Create an EC2 Instance
 resource "aws_instance" "my_instance" {
   ami           = "ami-005fc0f236362e99f"  # Update with a valid AMI ID in your region
-  instance_type = "t2.medium"  # Adjust the instance type as per your needs
+  instance_type = "t2.micro"  # Adjust the instance type as per your needs
 
   tags = {
     Name = "Instance_pull"
