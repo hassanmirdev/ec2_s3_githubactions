@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - test3
   pull_request:
     branches:
       - main
-      - test3
 
 jobs:
   terraform:
