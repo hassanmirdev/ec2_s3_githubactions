@@ -1,4 +1,4 @@
-name: Automate AWS Infrastructure Deployment
+name: Automate AWS Infrastructure Deployment.
 
 on:
   push:
